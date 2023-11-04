@@ -2,7 +2,10 @@
 
 | Backend Technologies      | Badges                |
 |---------------------------|-----------------------|
-|  Node JS                  |[!nodejs](https://img.shields.io/badge/Node%20js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)|
+|  Node JS                  |
+![image]({https://img.shields.io/badge/Node%20js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white})
+
+[!nodejs]()|
 | Express JS                |Express JS             |
 | Middleware & Pareser      |
 | JWT Token                 |
