@@ -28,11 +28,28 @@ async function run() {
   try {
     // Connect the client to the server
     await client.connect();
+
+    //Database and Collection
+    const menuCollection = client.db("hungryDb").collection("menu");
+    const reviewsCollection = client.db("hungryDb").collection("reviews");
+
+    //!Get all Menu--> Read : (CRUD) (Default all get)
+    app.get("/menu", async (req, res) => {
+      const cursor = menuCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
+    //!Get all Reviews--> Read : (CRUD) (Default all get)
+    app.get("/reviews", async (req, res) => {
+      const cursor = reviewsCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
-    console.log(
-      "OHHHH!!! Pinged your deployment. You successfully connected to MongoDB!"
-    );
+    console.log("Pinged your deployment successfully ");
   } finally {
     // await client.close();
   }
