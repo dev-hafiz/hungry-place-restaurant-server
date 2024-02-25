@@ -11,6 +11,17 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
+// Enable CORS for all routes
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*"); // Allow all origins
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS"); // Allow specific HTTP methods
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  ); // Allow specific headers
+  next();
+});
+
 // const uri = `mongodb+srv://${process.env.USER_SECRET}:${process.env.PASSWORD_SECRET}@cluster0.luy9u.mongodb.net/?retryWrites=true&w=majority`;
 
 const uri = `mongodb://${process.env.USER_SECRET}:${process.env.PASSWORD_SECRET}@cluster0-shard-00-00.luy9u.mongodb.net:27017,cluster0-shard-00-01.luy9u.mongodb.net:27017,cluster0-shard-00-02.luy9u.mongodb.net:27017/?ssl=true&replicaSet=atlas-9im02q-shard-0&authSource=admin&retryWrites=true&w=majority&appName=Cluster0`;
@@ -231,43 +242,44 @@ async function run() {
       });
     });
 
-      // using aggregate pipeline
-    app.get('/order-stats', async (req, res) => {
-      const result = await paymentCollection.aggregate([
-        {
-          $unwind: '$foodItemIds'
-        },
-        {
-          $lookup: {
-            from: 'menu',
-            localField: 'foodItemIds',
-            foreignField: '_id',
-            as: 'menuItems'
-          }
-        },
-        {
-          $unwind: '$menuItems'
-        },
-        {
-          $group: {
-            _id: '$menuItems.category',
-            quantity: { $sum: 1 },
-            revenue: { $sum: '$menuItems.price' }
-          }
-        },
-        {
-          $project: {
-            _id: 0,
-            category: '$_id',
-            quantity: '$quantity',
-            revenue: '$revenue'
-          }
-        }
-      ]).toArray();
+    // using aggregate pipeline
+    app.get("/order-stats", async (req, res) => {
+      const result = await paymentCollection
+        .aggregate([
+          {
+            $unwind: "$foodItemIds",
+          },
+          {
+            $lookup: {
+              from: "menu",
+              localField: "foodItemIds",
+              foreignField: "_id",
+              as: "menuItems",
+            },
+          },
+          {
+            $unwind: "$menuItems",
+          },
+          {
+            $group: {
+              _id: "$menuItems.category",
+              quantity: { $sum: 1 },
+              revenue: { $sum: "$menuItems.price" },
+            },
+          },
+          {
+            $project: {
+              _id: 0,
+              category: "$_id",
+              quantity: "$quantity",
+              revenue: "$revenue",
+            },
+          },
+        ])
+        .toArray();
 
       res.send(result);
-
-    })
+    });
 
     //*-------PAYMENT RELATED ROUTE END-------*//
 
