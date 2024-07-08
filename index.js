@@ -133,6 +133,21 @@ async function run() {
       res.send(result);
     });
 
+    //! CART: use put method for single update
+    app.put("/carts/:id", async (req, res) => {
+      const id = req.params.id;
+      const { quantity, price } = req.body; // Destructure quantity and price from request body
+      const filter = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: {
+          quantity: quantity,
+          price: price,
+        },
+      };
+      const result = await cartCollection.updateOne(filter, updateDoc); // Use updateOne to update a single document
+      res.send(result);
+    });
+
     //! Get cart order data for specific user via email
     app.get("/carts", async (req, res) => {
       const email = req.query.email;
