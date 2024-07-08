@@ -136,7 +136,7 @@ async function run() {
     //! CART: use put method for single update
     app.put("/carts/:id", async (req, res) => {
       const id = req.params.id;
-      const { quantity, price } = req.body; // Destructure quantity and price from request body
+      const { quantity, price } = req.body;
       const filter = { _id: new ObjectId(id) };
       const updateDoc = {
         $set: {
@@ -144,7 +144,7 @@ async function run() {
           price: price,
         },
       };
-      const result = await cartCollection.updateOne(filter, updateDoc); // Use updateOne to update a single document
+      const result = await cartCollection.updateOne(filter, updateDoc);
       res.send(result);
     });
 
