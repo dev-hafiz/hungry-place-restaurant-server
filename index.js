@@ -249,41 +249,57 @@ async function run() {
 
     // using aggregate pipeline
     app.get("/order-stats", async (req, res) => {
-      const result = await paymentCollection
-        .aggregate([
-          {
-            $unwind: "$foodItemIds",
-          },
-          {
-            $lookup: {
-              from: "menu",
-              localField: "foodItemIds",
-              foreignField: "_id",
-              as: "menuItems",
+      try {
+        const result = await paymentCollection
+          .aggregate([
+            {
+              $unwind: "$foodItemIds",
             },
-          },
-          {
-            $unwind: "$menuItems",
-          },
-          {
-            $group: {
-              _id: "$menuItems.category",
-              quantity: { $sum: 1 },
-              revenue: { $sum: "$menuItems.price" },
+            {
+              $addFields: {
+                foodItemObjectId: {
+                  $convert: { input: "$foodItemIds", to: "objectId" },
+                }, // Convert string to ObjectId
+              },
             },
-          },
-          {
-            $project: {
-              _id: 0,
-              category: "$_id",
-              quantity: "$quantity",
-              revenue: "$revenue",
+            {
+              $lookup: {
+                from: "menu",
+                localField: "foodItemObjectId",
+                foreignField: "_id",
+                as: "menuItems",
+              },
             },
-          },
-        ])
-        .toArray();
+            {
+              $unwind: "$menuItems",
+            },
+            {
+              $group: {
+                _id: "$menuItems.category",
+                quantity: { $sum: 1 },
+                revenue: { $sum: { $toDouble: "$menuItems.price" } },
+              },
+            },
+            {
+              $project: {
+                _id: 0,
+                category: "$_id",
+                quantity: "$quantity",
+                revenue: "$revenue",
+              },
+            },
+          ])
+          .toArray();
 
-      res.send(result);
+        console.log("Order stats result:", result);
+
+        res.send(result);
+      } catch (error) {
+        console.error("Error fetching order stats:", error);
+        res.status(500).send({
+          error: "An error occurred while fetching order stats.",
+        });
+      }
     });
 
     //*-------PAYMENT RELATED ROUTE END-------*//
