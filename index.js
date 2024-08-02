@@ -211,39 +211,40 @@ async function run() {
 
     //State or Analytics
     app.get("/admin-stats", async (req, res) => {
-      const users = await userCollection.estimatedDocumentCount();
-      const menuItems = await menuCollection.estimatedDocumentCount();
-      const orders = await paymentCollection.estimatedDocumentCount();
+      try {
+        const users = await userCollection.estimatedDocumentCount();
+        const menuItems = await menuCollection.estimatedDocumentCount();
+        const orders = await paymentCollection.estimatedDocumentCount();
 
-      // this is not the best way
-      // const payments = await paymentCollection.find().toArray();
-      // const revenue = payments.reduce(
-      //   (total, payment) => total + payment.price,
-      //   0
-      // );
-
-      // it is the best way
-      const result = await paymentCollection
-        .aggregate([
-          {
-            $group: {
-              _id: null,
-              totalRevenue: {
-                $sum: "$price",
+        const result = await paymentCollection
+          .aggregate([
+            {
+              $group: {
+                _id: null,
+                totalRevenue: {
+                  $sum: {
+                    $toDouble: "$price", // Convert price from string to double
+                  },
+                },
               },
             },
-          },
-        ])
-        .toArray();
+          ])
+          .toArray();
 
-      const revenue = result.length > 0 ? result[0].totalRevenue : 0;
+        const revenue = result.length > 0 ? result[0].totalRevenue : 0;
 
-      res.send({
-        users,
-        menuItems,
-        orders,
-        revenue,
-      });
+        res.send({
+          users,
+          menuItems,
+          orders,
+          revenue,
+        });
+      } catch (error) {
+        console.error("Error calculating admin stats:", error);
+        res.status(500).send({
+          error: "An error occurred while calculating admin stats.",
+        });
+      }
     });
 
     // using aggregate pipeline
