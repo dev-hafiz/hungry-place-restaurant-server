@@ -326,6 +326,14 @@ async function run() {
       res.send(result);
     });
 
+    //! Get User by specific email
+    app.get("/users/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const user = await userCollection.findOne(query);
+      res.send(user);
+    });
+
     //! Make Admin Role : use patch method for single update
     app.patch("/users/admin/:id", async (req, res) => {
       const id = req.params.id;
