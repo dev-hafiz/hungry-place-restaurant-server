@@ -342,6 +342,21 @@ async function run() {
       res.send(user);
     });
 
+    //! Update user information in userCollection with add new property and velue
+    app.put("/users/:id", async (req, res) => {
+      const id = req.params.id;
+      const user = req.body;
+      console.log(user);
+      const filter = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: {
+          ...user,
+        },
+      };
+      const result = await userCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    });
+
     //! Make Admin Role : use patch method for single update
     app.patch("/users/admin/:id", async (req, res) => {
       const id = req.params.id;
