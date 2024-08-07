@@ -334,6 +334,14 @@ async function run() {
       res.send(user);
     });
 
+    //!Get User by specific ID
+    app.get("/users/id/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const user = await userCollection.findOne(query);
+      res.send(user);
+    });
+
     //! Make Admin Role : use patch method for single update
     app.patch("/users/admin/:id", async (req, res) => {
       const id = req.params.id;
