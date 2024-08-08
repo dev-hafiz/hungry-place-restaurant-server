@@ -95,8 +95,11 @@ async function run() {
           name: item.name,
           category: item.category,
           price: item.price,
-          recipe: item.recipe,
-          image: item.image,
+          description: item.description,
+          preparation_time: item.preparation_time,
+          calories: item.calories,
+          ingredients: item.ingredients,
+          image_url: item.image_url,
         },
       };
       const result = await menuCollection.updateOne(filter, updatedDoc);
