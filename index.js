@@ -121,6 +121,13 @@ async function run() {
       res.send(result);
     });
 
+    //! Post review in reviews collection
+    app.post("/reviews", async (req, res) => {
+      const review = req.body;
+      const result = await reviewsCollection.insertOne(review);
+      res.send(result);
+    });
+
     //!Get all Reviews--> Read : (CRUD) (Default all get)
     app.get("/reviews", async (req, res) => {
       const cursor = reviewsCollection.find();
